@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Khyl3d AI CHAT Script — helpful AI chat with web references when available.">
+<title>Khyl3d AI CHAT Script</title>
+<style>
+:root{color-scheme:dark;--bg:#0b1220;--panel:#121d31;--line:#263650;--text:#eef4ff;--muted:#aab8cf;--accent:#65d6ad}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(145deg,#0b1220,#101d33);color:var(--text);font:16px/1.5 system-ui,Segoe UI,Arial,sans-serif;min-height:100vh;display:flex;justify-content:center}
+main{width:min(920px,100%);padding:20px;display:flex;flex-direction:column;min-height:100vh;gap:14px}
+header{padding:18px 20px;border:1px solid var(--line);background:#111c2f;border-radius:18px}
+h1{font-size:clamp(1.4rem,4vw,2rem);margin:0}header p{margin:5px 0 0;color:var(--muted)}
+#chat{flex:1;min-height:300px;max-height:62vh;overflow:auto;background:#0e1829;border:1px solid var(--line);border-radius:18px;padding:18px}
+.msg{margin:0 0 16px;white-space:pre-wrap;overflow-wrap:anywhere}.who{font-weight:700;color:var(--accent);margin-bottom:4px}.user .who{color:#93b8ff}
+form{display:flex;gap:10px}textarea{resize:vertical;min-height:60px;max-height:180px;flex:1;background:#111c2f;border:1px solid var(--line);border-radius:14px;padding:13px;color:var(--text);font:inherit}
+button{border:0;border-radius:14px;background:var(--accent);color:#092017;font-weight:800;padding:0 22px;cursor:pointer}button:disabled{opacity:.55;cursor:wait}
+.note{color:var(--muted);font-size:.86rem}.status{min-height:1.4em;color:var(--muted);font-size:.9rem}
+a{color:#9dc5ff}
+@media(max-width:560px){main{padding:10px}form{flex-direction:column}button{min-height:48px}#chat{max-height:none}}
+</style>
+</head>
+<body><main>
+<header><h1>Khyl3d AI CHAT Script</h1><p>Your friendly AI helper · Web search and references when available</p></header>
+<section id="chat" aria-live="polite">
+<div class="msg"><div class="who">Khyl3d AI</div>Welcome! Ask a question to get started. I can make mistakes, so verify important information with reliable sources.</div>
+</section>
+<div class="status" id="status" role="status"></div>
+<form id="form"><textarea id="message" maxlength="3000" placeholder="Ask a question… (Ctrl+Enter to send)" aria-label="Your message" required></textarea><button id="send" type="submit">Send</button></form>
+<div class="note">Please do not enter passwords, payment details, or other sensitive personal information. This public demo has usage limits.</div>
+</main>
+<script>
+const form=document.querySelector('#form'), input=document.querySelector('#message'), chat=document.querySelector('#chat'), send=document.querySelector('#send'), status=document.querySelector('#status');
+function addMessage(who,text,cls=''){const wrap=document.createElement('div');wrap.className='msg '+cls;const label=document.createElement('div');label.className='who';label.textContent=who;const content=document.createElement('div');content.textContent=text;wrap.append(label,content);chat.append(wrap);chat.scrollTop=chat.scrollHeight;}
+async function submitMessage(){const message=input.value.trim();if(!message||send.disabled)return;addMessage('You',message,'user');input.value='';send.disabled=true;status.textContent='Thinking…';
+try{const res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message})});const data=await res.json();if(!res.ok)throw new Error(data.detail||'Request failed');addMessage('Khyl3d AI',data.answer);status.textContent='Ready.';}
+catch(err){status.textContent=err.message||'Connection failed. Please try again.';}
+finally{send.disabled=false;input.focus();}}
+form.addEventListener('submit',e=>{e.preventDefault();submitMessage();});
+input.addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();submitMessage();}});
+</script></body></html>

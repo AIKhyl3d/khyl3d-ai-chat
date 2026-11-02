@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: khyl3d-ai-chat
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: OPENAI_MODEL
+        value: gpt-4.1-mini
+      - key: MAX_MESSAGE_CHARS
+        value: "3000"
+      - key: MAX_OUTPUT_TOKENS
+        value: "700"
+      - key: PER_MINUTE_LIMIT
+        value: "8"
+      - key: PER_DAY_IP_LIMIT
+        value: "40"
+      - key: GLOBAL_DAILY_REQUEST_LIMIT
+        value: "500"
